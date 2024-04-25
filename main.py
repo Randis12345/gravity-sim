@@ -59,12 +59,14 @@ class Planet():
 			
 
 	def draw(s):
+		drawpos = [s.pos[0]+offset[0],s.pos[1]+offset[1]]
 		# weird lines when drawing off screen?
-		if s.pos[0] < 0 or s.pos[0] > SS[0] or s.pos[1] < 0 or s.pos[1] > SS[1] : return
-		p.draw.circle(screen,"black",s.pos,s.radius)
+		if drawpos[0] < 0 or drawpos[0] > SS[0] or drawpos[1] < 0 or drawpos[1] > SS[1] : return
+		p.draw.circle(screen,"black",drawpos,s.radius)
 
 SS = (600,600)
 
+offset = [0,0]
 screen = p.display.set_mode(SS)
 clock = p.time.Clock()
 dt = 1/60
@@ -84,13 +86,21 @@ for line in inputfile:
 
 
 
-
+lastmousepos = -1
 running = True
 while running:
 	dt = clock.tick(60)/1000
 	for event in p.event.get():
 		if event.type == p.QUIT:
 			running = False
+	if p.mouse.get_pressed()[0]:
+		mousepos = p.mouse.get_pos()
+		if lastmousepos != -1:
+			offset[0]+= mousepos[0]-lastmousepos[0]
+			offset[1]+= mousepos[1]-lastmousepos[1]
+		lastmousepos = mousepos
+	else:
+		lastmousepos = -1
 
 	for planet in planets: planet.update()
 	screen.fill("white")
