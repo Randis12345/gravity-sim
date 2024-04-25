@@ -1,0 +1,2 @@
+bunch 10 random(0,600) random(0,600) random(-100,100) random(-100,100) 100
+300 300 0 0 random(2000,3000)

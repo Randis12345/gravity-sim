@@ -1,0 +1,15 @@
+# "input.txt" is read for creating the Planet
+# lines beginng with a hastag will be ignored(all lines with leading or trailing whitespace will be trimmed)
+# each line creates a planet with the numbers in the line(seperated with spaces) as parameters following this format:
+# (x position) (y position) (x velocity, set to 0 if no input) (y velocity, set to 0 if no input) (mass, set to 100 if no input)
+# or if you want to randomly generated a parameter put: random(min,max) to generate a random value with the provided range
+# if you want to do a bunch of the same planet(using random will result in different random parameters for each planet), start of the line with the word "bunch" and the amount of planets(divided by a space), then with the standard parameters for a single planet
+# examples:
+
+
+# generate 10 planets with random positions on the screen(dimensions are 600x600) with random velocities all with the default mass
+bunch 10 random(0,600) random(0,600) random(-100,100) random(-100,100) 100
+
+# generate a planet in the center of the screen with a random large mass
+
+300 300 0 0 random(2000,3000)

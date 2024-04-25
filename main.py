@@ -1,17 +1,30 @@
 from math import sqrt,pi
+from random import randint
 import pygame as p
 
 def killplanet(planet):
 	planets.remove(planet)
 
+BUNCH_PRE = "bunch"
+RANDOM_PRE = "random"
+
+def processparam(inp):
+	if inp[:len(RANDOM_PRE)] == RANDOM_PRE:
+		mid = len(RANDOM_PRE)
+		while inp[mid] != ",": mid+=1
+		minval = int(inp[len(RANDOM_PRE)+1:mid])
+		maxval = int(inp[mid+1:-1])
+		return randint(minval,maxval)
+	else: return float(inp)
+
 class Planet():
-	def __init__(s,x,y,mass=100):
+	def __init__(s,x,y,xv=0,yv=0,mass=100):
 		s.mass = mass
 		s.density = 1
 		s.gravconst = 1000
 		s.updateradius()
 
-		s.vel = [0,0]
+		s.vel = [xv,yv]
 		s.pos = [x,y]
 
 	def updateradius(s):
@@ -28,13 +41,16 @@ class Planet():
 		for planet in planets:
 			if planet == s: continue
 			distance = s.distanceto(planet)
-			acclmag = planet.mass*s.gravconst/distance**3
-			accl = [acclmag*(planet.pos[0]-s.pos[0]),acclmag*(planet.pos[1]-s.pos[1])]
-			s.vel[0]+=accl[0]*dt
-			s.vel[1]+=accl[1]*dt
+			if distance !=0:
+				acclmag = planet.mass*s.gravconst/distance**3
+				accl = [acclmag*(planet.pos[0]-s.pos[0]),acclmag*(planet.pos[1]-s.pos[1])]
+				s.vel[0]+=accl[0]*dt
+				s.vel[1]+=accl[1]*dt
 			if s.iscol(planet,distance):
 				s.vel[0] = (s.vel[0]*s.mass+planet.vel[0]*planet.mass)/(planet.mass+s.mass)
 				s.vel[1] = (s.vel[1]*s.mass+planet.vel[1]*planet.mass)/(planet.mass+s.mass)
+				if planet.mass > s.mass:
+					s.pos = planet.pos
 				s.mass+=planet.mass
 				s.updateradius()
 				killplanet(planet)
@@ -43,14 +59,31 @@ class Planet():
 			
 
 	def draw(s):
+		# weird lines when drawing off screen?
+		if s.pos[0] < 0 or s.pos[0] > SS[0] or s.pos[1] < 0 or s.pos[1] > SS[1] : return
 		p.draw.circle(screen,"black",s.pos,s.radius)
 
 SS = (600,600)
+
 screen = p.display.set_mode(SS)
 clock = p.time.Clock()
 dt = 1/60
 
-planets = [Planet(300,300),Planet(500,400)]
+inputfile = open("input.txt")
+planets = []
+
+for line in inputfile:
+	line = line.lower().strip()
+	if len(line) == 0 or line[0] == "#": continue
+	params = [x for x in line.split(" ")]
+	if params[0] == "bunch":
+		for i in range(int(processparam(params[1]))):
+			planets.append(Planet(*[processparam(x) for x in params[2:]]))
+	else:
+		planets.append(Planet(*[processparam(x) for x in params]))
+
+
+
 
 running = True
 while running:
